@@ -830,45 +830,56 @@ body.is-open .topbar {
   text-align: center;
 }
 
+/* =========================================================
+   POINT 3: COUNTDOWN TIMER (FROSTED GLASSMORPHISM)
+   ========================================================= */
 .countdown {
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  gap: clamp(0.75rem, 2vw, 1.4rem);
   width: min(860px, 100%);
-  margin: clamp(3rem, 6vw, 4.5rem) auto 0;
-  border-block: 1px solid var(--line);
+  margin: clamp(2.8rem, 5vw, 4rem) auto 0;
 }
 .countdown li {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: clamp(1.4rem, 3vw, 2.4rem) 0.5rem;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: clamp(1.4rem, 3.2vw, 2.4rem) 0.6rem;
+  background: rgba(255, 255, 255, 0.58);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px -10px rgba(58, 47, 36, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease), border-color 0.35s ease;
 }
-.countdown li + li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 22%;
-  bottom: 22%;
-  width: 1px;
-  background: var(--line);
+.countdown li:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 42px -12px rgba(217, 154, 106, 0.22);
+  border-color: rgba(217, 154, 106, 0.45);
 }
 .countdown strong {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-weight: 400;
-  font-size: clamp(2.8rem, 6.4vw, 5rem);
+  font-weight: 500;
+  font-size: clamp(2.4rem, 5.5vw, 4.4rem);
   line-height: 1;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
   color: var(--ink);
+  background: linear-gradient(135deg, var(--ink) 25%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .countdown span {
-  font-size: 0.56rem;
-  letter-spacing: 0.26em;
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--accent);
+  font-weight: 500;
 }
 
 .countdown__actions {
@@ -880,78 +891,133 @@ body.is-open .topbar {
 }
 
 /* =========================================================
-   EVENTS
+   POINT 4: EVENTS CARDS (DIMENSIONAL LUXURY CARDS)
    ========================================================= */
 .events__head { max-width: 720px; }
 
 .events {
-  margin-top: clamp(3rem, 6vw, 4.5rem);
-  border-top: 1px solid var(--line);
-}
-.events__item {
   display: grid;
-  grid-template-columns: 88px minmax(0, 1fr) auto;
-  gap: clamp(1rem, 3vw, 2.5rem);
-  align-items: start;
-  padding-block: clamp(1.8rem, 4vw, 2.8rem);
-  border-bottom: 1px solid var(--line);
-  transition: background-color 0.4s ease;
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+  gap: clamp(1.4rem, 3vw, 2.2rem);
+  margin-top: clamp(2.5rem, 5vw, 4rem);
 }
-.events__item:hover { background: var(--accent-soft); }
-.events__index {
-  font-size: 0.62rem;
-  letter-spacing: 0.2em;
-  color: var(--accent);
-  padding-top: 0.55rem;
-}
-.events__body { display: grid; gap: 0.85rem; }
-.events__title {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-weight: 400;
-  font-size: clamp(1.9rem, 3.4vw, 2.7rem);
-  line-height: 1.05;
-  letter-spacing: -0.01em;
-}
-.events__meta {
+
+.events__card {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.6rem;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-2);
+  flex-direction: column;
+  padding: clamp(1.8rem, 3.5vw, 2.5rem);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 22px;
+  box-shadow: 0 14px 34px -12px rgba(58, 47, 36, 0.08);
+  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease), border-color 0.4s ease;
 }
-.events__meta span { display: inline-flex; align-items: center; gap: 0.45rem; }
-.events__meta .icon { width: 15px; height: 15px; color: var(--accent); }
-.events__venue {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1.3rem;
-  line-height: 1.4;
-  color: var(--ink);
+
+.events__card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 22px 46px -12px rgba(217, 154, 106, 0.22);
+  border-color: rgba(217, 154, 106, 0.45);
 }
-.events__address {
-  max-width: 48ch;
-  font-size: 0.9rem;
-  line-height: 1.7;
-  color: var(--muted);
+
+.events__card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
 }
-.events__link {
+
+.events__badge {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 46px;
-  border: 1px solid var(--line-strong);
-  border-radius: 50%;
-  color: var(--ink);
-  transition: background-color 0.35s ease, color 0.35s ease,
-    border-color 0.35s ease, transform 0.35s var(--ease);
+  gap: 0.45rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid rgba(217, 154, 106, 0.35);
+  padding: 0.4rem 0.95rem;
+  border-radius: 999px;
 }
-.events__link:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-ink);
-  transform: translate(2px, -2px);
+
+.events__badge .icon {
+  width: 13px;
+  height: 13px;
+}
+
+.events__step {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.4rem;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.events__venue {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+  line-height: 1.2;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+}
+
+.events__address {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--muted);
+  margin-bottom: 1.4rem;
+}
+
+.events__address .icon--pin {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+.events__chips {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.8rem;
+}
+
+.events__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+  background: color-mix(in srgb, var(--bg) 65%, transparent);
+  border: 1px solid var(--line);
+  padding: 0.55rem 1rem;
+  border-radius: 12px;
+}
+
+.events__chip .icon {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+}
+
+.events__card-action {
+  margin-top: auto;
+}
+
+.events__map-btn {
+  width: 100%;
+  justify-content: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
 }
 
 .events__map {
@@ -994,39 +1060,122 @@ body.is-open .topbar {
 /* =========================================================
    STORY
    ========================================================= */
+/* =========================================================
+   POINT 2: ROMANTIC STEP TIMELINE
+   ========================================================= */
 .story__head { max-width: 680px; }
 
 .story {
-  margin-top: clamp(3rem, 6vw, 4.5rem);
-  border-top: 1px solid var(--line);
+  position: relative;
+  max-width: 780px;
+  margin: clamp(2.8rem, 5vw, 4rem) auto 0;
+  padding-left: 2.2rem;
 }
+
+.story::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 14px;
+  bottom: 24px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--accent) 0%, rgba(217, 154, 106, 0.25) 100%);
+  border-radius: 999px;
+}
+
 .story__item {
-  display: grid;
-  grid-template-columns: 170px minmax(0, 1fr);
-  gap: clamp(1rem, 4vw, 3rem);
-  padding-block: clamp(1.6rem, 3.5vw, 2.4rem);
-  border-bottom: 1px solid var(--line);
+  position: relative;
+  margin-bottom: clamp(1.8rem, 3.5vw, 2.5rem);
 }
-.story__date {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-style: italic;
-  font-size: 1.3rem;
+
+.story__item:last-child {
+  margin-bottom: 0;
+}
+
+.story__node {
+  position: absolute;
+  left: -2.2rem;
+  top: 14px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft), 0 4px 10px rgba(217, 154, 106, 0.35);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s ease;
+}
+
+.story__item:hover .story__node {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 6px var(--accent-soft), 0 6px 14px rgba(217, 154, 106, 0.5);
+}
+
+.story__card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: clamp(1.4rem, 3vw, 2rem);
+  box-shadow: 0 10px 30px -10px rgba(58, 47, 36, 0.07);
+  transition: transform 0.35s var(--ease), border-color 0.35s ease, box-shadow 0.35s var(--ease);
+}
+
+.story__item:hover .story__card {
+  transform: translateX(6px);
+  border-color: rgba(217, 154, 106, 0.45);
+  box-shadow: 0 16px 38px -12px rgba(217, 154, 106, 0.18);
+}
+
+.story__card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+}
+
+.story__date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   color: var(--accent);
-  padding-top: 0.1rem;
+  background: var(--accent-soft);
+  border: 1px solid rgba(217, 154, 106, 0.3);
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-weight: 500;
 }
-.story__body h3 {
+
+.story__date-badge .icon {
+  width: 12px;
+  height: 12px;
+}
+
+.story__step {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.25rem;
+  color: var(--muted);
+  opacity: 0.55;
+}
+
+.story__title {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-weight: 400;
   font-size: clamp(1.5rem, 2.4vw, 1.9rem);
-  line-height: 1.2;
+  line-height: 1.25;
   color: var(--ink);
+  margin-bottom: 0.5rem;
 }
-.story__body p {
-  max-width: 56ch;
-  margin-top: 0.5rem;
-  font-size: 0.92rem;
-  line-height: 1.75;
+
+.story__text {
+  font-size: 0.94rem;
+  line-height: 1.8;
   color: var(--muted);
+  margin: 0;
 }
 
 /* =========================================================
@@ -1484,111 +1633,272 @@ body.is-open .topbar {
 }
 .gift__head { text-align: center; }
 
+/* =========================================================
+   POINT 1: LUXURY BANK & GIFT CARDS
+   ========================================================= */
 .gift__accounts {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(1.2rem, 3vw, 2rem);
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+  gap: clamp(1.4rem, 3vw, 2.2rem);
   margin-top: clamp(2.5rem, 5vw, 4rem);
 }
+
 .gift-card {
   position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
-  padding: clamp(1.4rem, 3vw, 2rem);
-  border: 1px solid var(--line-strong);
-  background: color-mix(in srgb, var(--bg) 55%, transparent);
-  transition: background-color 0.35s ease, border-color 0.35s ease;
+  justify-content: space-between;
+  min-height: 220px;
+  padding: clamp(1.6rem, 3.5vw, 2.2rem);
+  border-radius: 20px;
+  box-shadow: 0 16px 38px -12px rgba(15, 23, 42, 0.28);
+  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
 }
-.gift-card:hover { border-color: var(--ink-2); background: var(--bg); }
-.gift-card__top {
+
+.gift-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.38);
+}
+
+/* Dark Obsidian / Metallic Sapphire Card (e.g. BCA) */
+.gift-card--dark {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 55%, #1e1b4b 100%);
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Warm Champagne / Bronze Metal Card (e.g. Mandiri) */
+.gift-card--gold {
+  background: linear-gradient(135deg, #2d241e 0%, #1a1512 55%, #3d2f24 100%);
+  color: #fdfbf7;
+  border: 1px solid rgba(217, 154, 106, 0.35);
+}
+
+.gift-card__bg-watermark {
+  position: absolute;
+  right: -10px;
+  bottom: -20px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 8rem;
+  font-weight: 600;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+  user-select: none;
+}
+
+.gift-card__header {
+  position: relative;
+  z-index: 2;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gift-card__chip-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gift-card__chip {
+  width: 38px;
+  height: 28px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #e6c89f 0%, #b88d57 50%, #d4af7a 100%);
+  color: #4a341b;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 2px 6px rgba(0, 0, 0, 0.25);
+  padding: 3px;
+}
+
+.gift-card__contactless {
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  opacity: 0.45;
+  transform: rotate(90deg);
+  display: inline-block;
+}
+
+.gift-card__bank-badge {
+  text-align: right;
+}
+
+.gift-card__bank-name {
+  display: block;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.gift-card__type {
+  display: block;
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.25rem;
+}
+
+.gift-card__number-wrap {
+  position: relative;
+  z-index: 2;
+  margin-block: 1.4rem 1rem;
+}
+
+.gift-card__num-label {
+  display: block;
+  font-size: 0.55rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.3rem;
+}
+
+.gift-card__number {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.1;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  word-break: break-all;
+}
+
+.gift-card__footer {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 1rem;
 }
-.gift-card__bank {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1.55rem;
-  line-height: 1.1;
-  color: var(--ink);
-}
-.gift-card__label {
+
+.gift-card__holder-label {
+  display: block;
   font-size: 0.55rem;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.2rem;
 }
-.gift-card__number {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: clamp(1.5rem, 2.8vw, 2rem);
-  letter-spacing: 0.06em;
-  line-height: 1.1;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
-}
+
 .gift-card__holder {
-  font-size: 0.72rem;
+  font-size: 0.85rem;
+  font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #ffffff;
+  line-height: 1.2;
 }
-.gift-card__copy {
+
+.gift-card__copy-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  align-self: flex-start;
-  font-size: 0.58rem;
-  letter-spacing: 0.18em;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--accent);
-  padding-bottom: 0.2rem;
-  border-bottom: 1px solid var(--accent);
-  transition: opacity 0.3s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s var(--ease);
 }
-.gift-card__copy:hover { opacity: 0.65; }
-.gift-card__copy .icon { width: 14px; height: 14px; }
 
-.gift__address {
-  margin-top: clamp(2rem, 4vw, 3rem);
-  padding-top: clamp(2rem, 4vw, 3rem);
-  border-top: 1px solid var(--line);
-  text-align: center;
+.gift-card__copy-btn:hover {
+  background: #ffffff;
+  color: var(--ink);
+  border-color: #ffffff;
+  transform: scale(1.05);
 }
-.gift__address .icon {
+
+.gift-card__copy-btn.is-copied {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+}
+
+/* Address Card */
+.gift-address-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: clamp(2.5rem, 5vw, 3.8rem);
+  padding: clamp(1.8rem, 4vw, 2.6rem);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 22px;
+  box-shadow: 0 12px 32px -12px rgba(58, 47, 36, 0.08);
+}
+
+.gift-address-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid rgba(217, 154, 106, 0.3);
+  margin-bottom: 1.1rem;
+}
+
+.gift-address-card__icon .icon {
   width: 22px;
   height: 22px;
-  margin-inline: auto;
-  color: var(--accent);
 }
-.gift__address h3 {
-  margin-top: 0.9rem;
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-weight: 400;
-  font-size: 1.45rem;
-  color: var(--ink);
-}
-.gift__address p {
-  max-width: 38ch;
-  margin: 0.35rem auto 0;
-  font-size: 0.9rem;
-  line-height: 1.7;
-  color: var(--muted);
-}
-.gift__address button {
-  margin-top: 1rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.58rem;
-  letter-spacing: 0.18em;
+
+.gift-address-card__tag {
+  display: inline-block;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--accent);
-  border-bottom: 1px solid var(--accent);
-  padding-bottom: 0.2rem;
+  margin-bottom: 0.35rem;
+  font-weight: 500;
 }
-.gift__address button:hover { opacity: 0.65; }
+
+.gift-address-card__title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.6rem, 2.6vw, 2rem);
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 0.6rem;
+}
+
+.gift-address-card__desc {
+  max-width: 46ch;
+  font-size: 0.94rem;
+  line-height: 1.7;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+
+.gift-address-card__recipient {
+  font-size: 0.84rem;
+  color: var(--ink-2);
+  margin-bottom: 1.5rem;
+}
+
+.gift-address-card__action .btn {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  padding: 0.65rem 1.6rem;
+}
 
 /* =========================================================
    CLOSING
@@ -1957,15 +2267,10 @@ body:not(.is-ready) .reveal { transition: none; }
   .person--right { text-align: left; }
   .person--right .person__ig { flex-direction: row; }
 
-  .events__item {
-    grid-template-columns: 1fr auto;
-    gap: 1rem 1.5rem;
-  }
-  .events__index { grid-column: 1 / -1; padding-top: 0; }
-  .events__body { grid-column: 1 / 2; }
-  .events__link { grid-column: 2 / 3; grid-row: 2 / 3; align-self: start; }
+  .events { grid-template-columns: 1fr; }
 
-  .story__item { grid-template-columns: 1fr; gap: 0.5rem; }
+  .story { padding-left: 1.8rem; }
+  .story__node { left: -1.8rem; width: 18px; height: 18px; }
 
   .rsvp__grid { grid-template-columns: 1fr; }
   .wishes { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; padding-top: 2rem; }
@@ -1992,14 +2297,17 @@ body:not(.is-ready) .reveal { transition: none; }
   .cover__tag { display: none; }
   .cover__date { font-size: 0.6rem; letter-spacing: 0.18em; }
 
-  .countdown strong { font-size: clamp(2rem, 9vw, 2.8rem); }
-  .countdown li { padding-block: 1.2rem; }
-  .countdown span { font-size: 0.5rem; letter-spacing: 0.18em; }
+  .countdown { gap: 8px; }
+  .countdown li { padding: 1rem 0.25rem; border-radius: 14px; gap: 0.35rem; }
+  .countdown strong { font-size: clamp(1.8rem, 8vw, 2.4rem); }
+  .countdown span { font-size: 0.48rem; letter-spacing: 0.16em; }
   .countdown__actions .btn { flex: 1; min-width: 0; }
   .countdown__actions .btn .icon { display: none; }
 
-  .events__item { padding-block: 1.6rem; }
-  .events__meta { font-size: 0.64rem; gap: 0.4rem 1rem; }
+  .events__card { padding: 1.4rem; border-radius: 18px; }
+  .events__venue { font-size: 1.5rem; }
+  .events__address { font-size: 0.82rem; }
+  .events__chip { font-size: 0.74rem; padding: 0.45rem 0.75rem; }
   .events__map-link { left: 0.7rem; bottom: 0.7rem; font-size: 0.55rem; }
 
   .gallery-track {
@@ -2038,10 +2346,61 @@ body:not(.is-ready) .reveal { transition: none; }
 }
 
 /* =========================================================
+   POINT 5: AMBIENT FLOATING PETALS (MODULAR & EASILY REMOVABLE)
+   Jika suatu saat tidak cocok/tidak diinginkan, cukup hapus atau komentari blok ini,
+   atau set: .ambient-petals { display: none !important; }
+   ========================================================= */
+.ambient-petals {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 12;
+  overflow: hidden;
+}
+
+.petal {
+  position: absolute;
+  top: -40px;
+  display: block;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 235, 220, 0.88), rgba(217, 154, 106, 0.42) 70%, transparent 100%);
+  border-radius: 50% 15% 50% 50% / 60% 40% 60% 40%;
+  filter: blur(0.4px);
+  opacity: 0;
+  animation: petalFall linear infinite;
+}
+
+.petal--1 { left: 8%; width: 14px; height: 18px; animation-duration: 15s; animation-delay: 0s; }
+.petal--2 { left: 24%; width: 10px; height: 13px; animation-duration: 18s; animation-delay: 2.5s; opacity: 0.6; }
+.petal--3 { left: 42%; width: 16px; height: 21px; animation-duration: 14s; animation-delay: 5s; }
+.petal--4 { left: 58%; width: 12px; height: 15px; animation-duration: 19s; animation-delay: 1.2s; opacity: 0.5; }
+.petal--5 { left: 72%; width: 15px; height: 19px; animation-duration: 16s; animation-delay: 4s; }
+.petal--6 { left: 86%; width: 11px; height: 14px; animation-duration: 21s; animation-delay: 7s; opacity: 0.65; }
+.petal--7 { left: 94%; width: 13px; height: 17px; animation-duration: 17s; animation-delay: 3s; }
+.petal--8 { left: 16%; width: 15px; height: 20px; animation-duration: 22s; animation-delay: 9s; opacity: 0.7; }
+
+@keyframes petalFall {
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg) translateX(0);
+  }
+  15% {
+    opacity: 0.75;
+  }
+  85% {
+    opacity: 0.65;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(105vh) rotate(540deg) translateX(60px);
+  }
+}
+
+/* =========================================================
    REDUCED MOTION
    ========================================================= */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .ambient-petals { display: none !important; }
   *,
   *::before,
   *::after {

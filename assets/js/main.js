@@ -318,21 +318,39 @@
       list.innerHTML = C.events
         .map((ev, i) => {
           const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.mapQuery)}`;
+          const isAkad = i === 0 || /akad|pemberkatan/i.test(ev.name);
+          const badgeIcon = isAkad ? "#i-heart" : "#i-calendar";
           return `
-            <li class="events__item">
-              <span class="events__index">0${i + 1}</span>
-              <div class="events__body">
-                <h3 class="events__title">${ev.name}</h3>
-                <p class="events__meta">
-                  <span><svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg>${ev.date}</span>
-                  <span>${ev.time}</span>
-                </p>
-                <p class="events__venue">${ev.venue}</p>
-                <p class="events__address">${ev.address}</p>
+            <li class="events__card reveal" data-delay="${i + 1}">
+              <div class="events__card-top">
+                <span class="events__badge">
+                  <svg class="icon" aria-hidden="true"><use href="${badgeIcon}"></use></svg>
+                  ${ev.name}
+                </span>
+                <span class="events__step">0${i + 1}</span>
               </div>
-              <a class="events__link" href="${mapUrl}" target="_blank" rel="noopener" aria-label="Lihat lokasi ${ev.name} di Google Maps">
-                <svg class="icon" aria-hidden="true"><use href="#i-arrow-up"></use></svg>
-              </a>
+              <h3 class="events__venue">${ev.venue}</h3>
+              <p class="events__address">
+                <svg class="icon icon--pin" aria-hidden="true"><use href="#i-pin"></use></svg>
+                <span>${ev.address}</span>
+              </p>
+              <div class="events__chips">
+                <div class="events__chip">
+                  <svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg>
+                  <span>${ev.date}</span>
+                </div>
+                <div class="events__chip">
+                  <svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>
+                  <span>${ev.time}</span>
+                </div>
+              </div>
+              <div class="events__card-action">
+                <a class="btn btn--solid btn--sm events__map-btn" href="${mapUrl}" target="_blank" rel="noopener">
+                  <svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>
+                  Buka di Google Maps
+                  <svg class="icon" aria-hidden="true"><use href="#i-arrow-up"></use></svg>
+                </a>
+              </div>
             </li>`;
         })
         .join("");
@@ -354,12 +372,19 @@
     if (list && Array.isArray(C.story)) {
       list.innerHTML = C.story
         .map(
-          (item) => `
-            <li class="story__item reveal">
-              <p class="story__date">${item.date}</p>
-              <div class="story__body">
-                <h3>${item.title}</h3>
-                <p>${item.text}</p>
+          (item, i) => `
+            <li class="story__item reveal" data-delay="${i + 1}">
+              <div class="story__node" aria-hidden="true"></div>
+              <div class="story__card">
+                <div class="story__card-head">
+                  <span class="story__date-badge">
+                    <svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg>
+                    ${item.date}
+                  </span>
+                  <span class="story__step">0${i + 1}</span>
+                </div>
+                <h3 class="story__title">${item.title}</h3>
+                <p class="story__text">${item.text}</p>
               </div>
             </li>`,
         )
@@ -684,22 +709,46 @@
   function renderGifts() {
     const wrap = $("#giftAccounts");
     if (wrap && Array.isArray(C.gifts)) {
+      const initials = getInitials();
       wrap.innerHTML = C.gifts
         .map(
-          (gift) => `
-            <article class="gift-card">
-              <div class="gift-card__top">
-                <div>
-                  <p class="gift-card__label">${gift.label}</p>
-                  <h3 class="gift-card__bank">${gift.bank}</h3>
+          (gift, i) => {
+            const formattedNumber = String(gift.number)
+              .replace(/(\d{4})/g, "$1 ")
+              .trim();
+            const isDark = i % 2 === 0;
+            const themeClass = isDark ? "gift-card--dark" : "gift-card--gold";
+            return `
+              <article class="gift-card ${themeClass} reveal" data-delay="${i + 1}">
+                <div class="gift-card__bg-watermark" aria-hidden="true">${initials}</div>
+                <div class="gift-card__header">
+                  <div class="gift-card__chip-wrap">
+                    <svg class="icon gift-card__chip" aria-hidden="true"><use href="#i-chip"></use></svg>
+                    <span class="gift-card__contactless" aria-hidden="true">)))</span>
+                  </div>
+                  <div class="gift-card__bank-badge">
+                    <span class="gift-card__bank-name">${gift.bank}</span>
+                    <span class="gift-card__type">${gift.label || "Transfer Bank"}</span>
+                  </div>
                 </div>
-                <button class="gift-card__copy" type="button" data-copy="${gift.number}" data-copy-label="Nomor rekening ${gift.bank}">
-                  <svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg>Salin
-                </button>
-              </div>
-              <p class="gift-card__number">${gift.number}</p>
-              <p class="gift-card__holder">a.n. ${gift.holder}</p>
-            </article>`,
+
+                <div class="gift-card__number-wrap">
+                  <span class="gift-card__num-label">Nomor Rekening</span>
+                  <p class="gift-card__number" aria-label="${gift.number}">${formattedNumber}</p>
+                </div>
+
+                <div class="gift-card__footer">
+                  <div class="gift-card__holder-wrap">
+                    <span class="gift-card__holder-label">Atas Nama</span>
+                    <p class="gift-card__holder">${gift.holder}</p>
+                  </div>
+                  <button class="gift-card__copy-btn btn btn--sm" type="button" data-copy="${gift.number}" data-copy-label="Nomor rekening ${gift.bank}">
+                    <svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg>
+                    <span>Salin No Rek</span>
+                  </button>
+                </div>
+              </article>`;
+          }
         )
         .join("");
     }
@@ -710,12 +759,23 @@
         C.giftAddress.recipient ||
         `${C.couple.bride.name} & ${C.couple.groom.name}`;
       addrWrap.innerHTML = `
-        <svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>
-        <h3>Kirim hadiah fisik</h3>
-        <p>${C.giftAddress.address}<br /><span class="gift-card__holder">a.n. ${recipient}</span></p>
-        <button type="button" data-copy="${C.giftAddress.address}" data-copy-label="Alamat pengiriman hadiah">
-          <svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg>Salin alamat
-        </button>`;
+        <div class="gift-address-card reveal">
+          <div class="gift-address-card__icon">
+            <svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>
+          </div>
+          <div class="gift-address-card__body">
+            <span class="gift-address-card__tag">Kado Pernikahan</span>
+            <h3 class="gift-address-card__title">Kirim Hadiah Fisik</h3>
+            <p class="gift-address-card__desc">${C.giftAddress.address}</p>
+            <p class="gift-address-card__recipient">Penerima: <strong>${recipient}</strong></p>
+          </div>
+          <div class="gift-address-card__action">
+            <button class="btn btn--solid btn--sm" type="button" data-copy="${C.giftAddress.address}" data-copy-label="Alamat pengiriman hadiah">
+              <svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg>
+              Salin Alamat
+            </button>
+          </div>
+        </div>`;
     }
 
     $$("[data-copy]").forEach((btn) => {
