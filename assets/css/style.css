@@ -1989,9 +1989,11 @@ body.is-open .topbar {
 }
 .footer__inner {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
+  gap: 0.8rem;
   width: 100%;
 }
 .footer__credit {
@@ -2008,6 +2010,29 @@ body.is-open .topbar {
   width: 13px;
   height: 13px;
   color: var(--accent);
+}
+.footer__guest-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  padding: 0.4rem 1rem;
+  border: 1px solid rgba(217, 154, 106, 0.35);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  transition: all 0.3s var(--ease);
+}
+.footer__guest-link:hover {
+  background: var(--accent);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+.footer__guest-link .icon {
+  width: 13px;
+  height: 13px;
 }
 
 /* =========================================================
