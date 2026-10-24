@@ -501,6 +501,20 @@
       font-size: 0.95rem;
     }
 
+    .gen-cat-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(217, 154, 106, 0.3);
+      margin-left: 0.4rem;
+      vertical-align: middle;
+      font-weight: 500;
+    }
+
     /* Tabs */
     .tab-nav {
       display: flex;
@@ -579,11 +593,12 @@
         <div class="gen-field">
           <label for="templateSelect">Gaya Pesan WhatsApp</label>
           <select id="templateSelect">
-            <option value="formal">1. Formal &amp; Santun (Keluarga, Tokoh, Kolega)</option>
+            <option value="formal" selected>1. Formal &amp; Santun (Keluarga, Tokoh, Kolega)</option>
             <option value="warm">2. Hangat &amp; Akrab (Sahabat, Teman Sebaya)</option>
             <option value="simple">3. Singkat &amp; Padat</option>
+            <option value="auto">🌟 Otomatis dari Kategori Excel (Teman = Akrab, Keluarga/VIP = Formal)</option>
           </select>
-          <span class="gen-hint">Berlaku untuk semua pesan yang digenerate.</span>
+          <span class="gen-hint">Bisa diubah kapan saja. Berlaku untuk pengiriman satuan maupun hasil import Excel.</span>
         </div>
       </div>
     </div>
@@ -664,7 +679,7 @@
         </div>
 
         <p class="gen-hint" style="margin-bottom: 1.2rem;">
-          Punya file Excel dengan kolom <strong>Nama</strong> dan <strong>No_WhatsApp</strong>? Tarik atau pilih filenya di bawah ini, semua tamu akan langsung otomatis diolah menjadi link undangan &amp; pesan WA!
+          Punya file Excel dengan kolom <strong>Nama Tamu</strong>, <strong>No WhatsApp</strong>, dan <strong>Kategori</strong>? Tarik atau pilih filenya di bawah ini, semua tamu akan langsung otomatis diolah menjadi link undangan &amp; pesan WA!
         </p>
 
         <!-- Dropzone -->
@@ -865,8 +880,21 @@ Dimas Prasetyo"></textarea>
         return base + separator + "to=" + encodeURIComponent(name);
       }
 
-      function generateMessage(name, url) {
-        const style = templateSelect.value;
+      function generateMessage(name, url, category = "") {
+        let style = templateSelect.value;
+
+        // Jika mode auto, deteksi dari kategori
+        if (style === "auto") {
+          const cat = String(category || "").toLowerCase();
+          if (cat.includes("teman") || cat.includes("sahabat") || cat.includes("kuliah") || cat.includes("sma") || cat.includes("partner") || cat.includes("akrab")) {
+            style = "warm";
+          } else if (cat.includes("singkat") || cat.includes("simple")) {
+            style = "simple";
+          } else {
+            style = "formal";
+          }
+        }
+
         const guestName = name.trim() || "[Nama Tamu]";
 
         if (style === "warm") {
@@ -961,7 +989,7 @@ Dimas Prasetyo"></textarea>
         localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
       }
 
-      function addGuest(name, phone = "", sent = false) {
+      function addGuest(name, phone = "", sent = false, category = "") {
         const trimmed = String(name || "").trim();
         if (!trimmed) return false;
         const list = loadGuests();
@@ -972,6 +1000,7 @@ Dimas Prasetyo"></textarea>
             name: trimmed,
             phone: String(phone || "").trim(),
             sent: !!sent,
+            category: String(category || "").trim(),
             createdAt: Date.now()
           });
           saveGuests(list);
@@ -1000,17 +1029,20 @@ Dimas Prasetyo"></textarea>
       // Download Template
       document.getElementById("downloadTemplateBtn").addEventListener("click", () => {
         const templateRows = [
-          ["Nama Tamu", "No WhatsApp", "Catatan"],
-          ["Bpk. Ahmad Dahlan & Keluarga", "081234567890", "Keluarga Besar"],
-          ["dr. Rian Prakoso", "081298765432", "Rekan Kerja"],
-          ["Kak Dinda & Partner", "081311223344", "Teman Kuliah"],
-          ["Ibu Sri Wahyuni", "085712345678", "Sahabat Ibu"],
-          ["Dimas Prasetyo", "", "Teman SMA"]
+          ["Nama Tamu", "No WhatsApp", "Kategori", "Catatan"],
+          ["Bpk. Ahmad Dahlan & Keluarga", "081234567890", "Keluarga", "Keluarga Besar Ayah"],
+          ["dr. Rian Prakoso, Sp.A", "081298765432", "Rekan Kerja", "Dokter RS"],
+          ["Kak Dinda & Partner", "081311223344", "Teman", "Sahabat Kuliah Arinta"],
+          ["Ibu Hj. Siti Aminah", "085712345678", "Keluarga", "Tante dari Fajar"],
+          ["Dimas Prasetyo", "082199887766", "Teman", "Teman SMA Fajar"],
+          ["Bpk. Hendra Gunawan", "081288990011", "VIP", "Kolega Kantor"],
+          ["Nadia Safira", "085677889900", "Teman", "Bridesmaid"],
+          ["Bpk. & Ibu Joko Widodo", "081122334455", "VIP", "Tetangga"]
         ];
 
         if (window.XLSX) {
           const ws = XLSX.utils.aoa_to_sheet(templateRows);
-          ws["!cols"] = [{ wch: 32 }, { wch: 18 }, { wch: 20 }];
+          ws["!cols"] = [{ wch: 32 }, { wch: 18 }, { wch: 16 }, { wch: 28 }];
           const wb = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(wb, ws, "Daftar_Tamu");
           XLSX.writeFile(wb, `Template_Daftar_Tamu_${bride}_${groom}.xlsx`);
@@ -1060,6 +1092,7 @@ Dimas Prasetyo"></textarea>
             const header = rows[0].map(h => String(h || "").toLowerCase().trim());
             let nameCol = header.findIndex(h => /nama|name|tamu|guest/i.test(h));
             let phoneCol = header.findIndex(h => /wa|whatsapp|phone|telepon|hp|no/i.test(h));
+            let categoryCol = header.findIndex(h => /kategori|category|relasi|hubungan|catatan/i.test(h));
 
             if (nameCol === -1) nameCol = 0; // Default first col
             if (phoneCol === -1 && header.length > 1) phoneCol = 1;
@@ -1070,8 +1103,9 @@ Dimas Prasetyo"></textarea>
               if (!row || !row[nameCol]) continue;
               const name = String(row[nameCol]).trim();
               const phone = phoneCol !== -1 && row[phoneCol] ? String(row[phoneCol]).trim() : "";
+              const category = categoryCol !== -1 && row[categoryCol] ? String(row[categoryCol]).trim() : "";
               if (name) {
-                pendingExcelData.push({ name, phone });
+                pendingExcelData.push({ name, phone, category });
               }
             }
 
@@ -1116,7 +1150,7 @@ Dimas Prasetyo"></textarea>
         if (!pendingExcelData.length) return;
         let count = 0;
         pendingExcelData.forEach(g => {
-          if (addGuest(g.name, g.phone)) count++;
+          if (addGuest(g.name, g.phone, false, g.category)) count++;
         });
         excelPreviewWrap.hidden = true;
         pendingExcelData = [];
@@ -1140,7 +1174,8 @@ Dimas Prasetyo"></textarea>
           const parts = line.split(/[,;\t]/).map(p => p.trim());
           const name = parts[0];
           const phone = parts[1] || "";
-          if (addGuest(name, phone)) count++;
+          const category = parts[2] || "";
+          if (addGuest(name, phone, false, category)) count++;
         });
         document.getElementById("bulkNames").value = "";
         renderGuestTable();
@@ -1184,7 +1219,7 @@ Dimas Prasetyo"></textarea>
 
         // Open WA
         const url = generateUrl(guest.name);
-        const msg = generateMessage(guest.name, url);
+        const msg = generateMessage(guest.name, url, guest.category);
         const phone = getCleanPhone(guest.phone);
         const waUrl = phone
           ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
@@ -1252,7 +1287,7 @@ Dimas Prasetyo"></textarea>
 
         tbody.innerHTML = filtered.map(g => {
           const url = generateUrl(g.name);
-          const msg = generateMessage(g.name, url);
+          const msg = generateMessage(g.name, url, g.category);
           const phone = getCleanPhone(g.phone);
           const waUrl = phone
             ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
@@ -1264,7 +1299,7 @@ Dimas Prasetyo"></textarea>
                 <input class="gen-check" type="checkbox" ${g.sent ? 'checked' : ''} aria-label="Centang jika sudah dikirim" />
               </td>
               <td>
-                <strong>${g.name}</strong>
+                <strong>${g.name}</strong>${g.category ? ` <span class="gen-cat-badge">${g.category}</span>` : ''}
               </td>
               <td style="color: var(--muted); font-family: monospace;">
                 ${g.phone || '-'}
@@ -1311,7 +1346,7 @@ Dimas Prasetyo"></textarea>
         const copyBtn = e.target.closest('[data-action="copy-msg"]');
         if (copyBtn && guest) {
           const url = generateUrl(guest.name);
-          const msg = generateMessage(guest.name, url);
+          const msg = generateMessage(guest.name, url, guest.category);
           copyToClipboard(msg, `Pesan untuk "${guest.name}" disalin!`);
           return;
         }
@@ -1361,6 +1396,7 @@ Dimas Prasetyo"></textarea>
           const headers = [
             "Nama Tamu",
             "No WhatsApp",
+            "Kategori",
             "Status",
             "Link Undangan Khusus",
             "Link Kirim WhatsApp",
@@ -1369,7 +1405,7 @@ Dimas Prasetyo"></textarea>
 
           const rows = guests.map(g => {
             const url = generateUrl(g.name);
-            const msg = generateMessage(g.name, url);
+            const msg = generateMessage(g.name, url, g.category);
             const phone = getCleanPhone(g.phone);
             const waUrl = phone
               ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
@@ -1378,6 +1414,7 @@ Dimas Prasetyo"></textarea>
             return [
               g.name,
               g.phone || "",
+              g.category || "",
               g.sent ? "Sudah Dikirim" : "Belum Dikirim",
               url,
               waUrl,
@@ -1388,6 +1425,7 @@ Dimas Prasetyo"></textarea>
           const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
           ws["!cols"] = [
             { wch: 30 },
+            { wch: 16 },
             { wch: 16 },
             { wch: 16 },
             { wch: 45 },
@@ -1412,16 +1450,16 @@ Dimas Prasetyo"></textarea>
           showToast("Belum ada data untuk diekspor.");
           return;
         }
-        let csv = "Nama Tamu,No WhatsApp,Status Pengiriman,Link Undangan,Link WA\n";
+        let csv = "Nama Tamu,No WhatsApp,Kategori,Status Pengiriman,Link Undangan,Link WA\n";
         guests.forEach(g => {
           const url = generateUrl(g.name);
-          const msg = generateMessage(g.name, url);
+          const msg = generateMessage(g.name, url, g.category);
           const phone = getCleanPhone(g.phone);
           const waUrl = phone
             ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
             : `https://wa.me/?text=${encodeURIComponent(msg)}`;
           const status = g.sent ? "Sudah Dikirim" : "Belum Dikirim";
-          csv += `"${g.name}","${g.phone || ''}","${status}","${url}","${waUrl}"\n`;
+          csv += `"${g.name}","${g.phone || ''}","${g.category || ''}","${status}","${url}","${waUrl}"\n`;
         });
 
         const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
