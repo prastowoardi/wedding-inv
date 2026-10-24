@@ -711,14 +711,13 @@
     if (wrap && Array.isArray(C.gifts)) {
       const initials = getInitials();
       wrap.innerHTML = C.gifts
-        .map(
-          (gift, i) => {
-            const formattedNumber = String(gift.number)
-              .replace(/(\d{4})/g, "$1 ")
-              .trim();
-            const isDark = i % 2 === 0;
-            const themeClass = isDark ? "gift-card--dark" : "gift-card--gold";
-            return `
+        .map((gift, i) => {
+          const formattedNumber = String(gift.number)
+            .replace(/(\d{4})/g, "$1 ")
+            .trim();
+          const isDark = i % 2 === 0;
+          const themeClass = isDark ? "gift-card--dark" : "gift-card--gold";
+          return `
               <article class="gift-card ${themeClass} reveal" data-delay="${i + 1}">
                 <div class="gift-card__bg-watermark" aria-hidden="true">${initials}</div>
                 <div class="gift-card__header">
@@ -748,8 +747,7 @@
                   </button>
                 </div>
               </article>`;
-          }
-        )
+        })
         .join("");
     }
 
@@ -784,10 +782,10 @@
         if (ok) {
           const originalHTML = btn.innerHTML;
           btn.innerHTML = `<svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Tersalin!`;
-          btn.classList.add('is-copied');
+          btn.classList.add("is-copied");
           setTimeout(() => {
             btn.innerHTML = originalHTML;
-            btn.classList.remove('is-copied');
+            btn.classList.remove("is-copied");
           }, 2000);
         }
         toast(
@@ -1464,35 +1462,55 @@
   }
 
   /* =====================================================
-     Buka undangan
+     Buka undangan (Luxury Envelope Unfolding)
      ===================================================== */
   function openInvitation() {
-    if (!cover || cover.classList.contains("is-open")) return;
+    if (
+      !cover ||
+      cover.classList.contains("is-open") ||
+      cover.classList.contains("is-opening")
+    )
+      return;
 
-    cover.classList.add("is-open");
-    body.classList.add("is-open");
+    cover.classList.add("is-opening");
+    const envelope = $("#envelope");
+    if (envelope) {
+      envelope.classList.add("is-unfolding");
+    }
+
     try {
       Music.start();
     } catch (e) {}
-    if (page) page.inert = false;
 
-    const finish = () => {
-      cover.hidden = true;
-      unlockScroll();
-      initReveal();
-      const opening = $("#opening");
-      if (opening) {
-        opening.tabIndex = -1;
-        try {
-          opening.focus({ preventScroll: true });
-        } catch (e) {}
+    const triggerOpen = () => {
+      cover.classList.add("is-open");
+      body.classList.add("is-open");
+      if (page) page.inert = false;
+
+      const finish = () => {
+        cover.hidden = true;
+        unlockScroll();
+        initReveal();
+        const opening = $("#opening");
+        if (opening) {
+          opening.tabIndex = -1;
+          try {
+            opening.focus({ preventScroll: true });
+          } catch (e) {}
+        }
+      };
+
+      if (reduceMotion) {
+        finish();
+      } else {
+        setTimeout(finish, 850);
       }
     };
 
     if (reduceMotion) {
-      finish();
+      triggerOpen();
     } else {
-      setTimeout(finish, 980);
+      setTimeout(triggerOpen, 380);
     }
   }
 
@@ -1545,19 +1563,24 @@
     initTopbar();
     initAnchors();
 
-    $("#openInvite")?.addEventListener("click", openInvitation);
+    // Hanya segel lilin (Wax Seal) yang dapat membuka undangan
+    const openTrigger = $("#openInvite");
+    if (openTrigger) {
+      openTrigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openInvitation();
+      });
+    }
+
+    // Kunci scroll / swipe di halaman awal (cover) agar tidak bisa discroll
     if (cover) {
-      cover.addEventListener("wheel", (e) => {
-        if (e.deltaY > 20) openInvitation();
-      }, { passive: true });
-      let touchY = 0;
-      cover.addEventListener("touchstart", (e) => {
-        touchY = e.touches[0]?.clientY || 0;
-      }, { passive: true });
-      cover.addEventListener("touchend", (e) => {
-        const endY = e.changedTouches[0]?.clientY || 0;
-        if (touchY - endY > 40) openInvitation();
-      }, { passive: true });
+      const preventCoverScroll = (e) => {
+        if (!cover.classList.contains("is-open")) {
+          e.preventDefault();
+        }
+      };
+      cover.addEventListener("wheel", preventCoverScroll, { passive: false });
+      cover.addEventListener("touchmove", preventCoverScroll, { passive: false });
     }
     $("#addCalendar")?.addEventListener("click", addToCalendar);
     $("#shareInvite")?.addEventListener("click", shareInvitation);

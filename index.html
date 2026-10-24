@@ -45,46 +45,134 @@
       <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></symbol>
       <symbol id="i-chip" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="9" y1="5" x2="9" y2="19"/><line x1="15" y1="5" x2="15" y2="19"/></symbol>
       <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M20 11.5a8 8 0 0 1-11.9 7L4 20l1.6-4A8 8 0 1 1 20 11.5z"/><path d="M9 9.2c.3-.7.6-.7 1-.7h.4c.2 0 .4 0 .6.5l.7 1.5c.1.3 0 .5-.1.7l-.5.6c-.2.2-.2.4-.1.6a5 5 0 0 0 2.3 2c.3.1.5.1.7-.1l.7-.8c.2-.2.4-.2.6-.1l1.6.8c.3.1.4.3.4.5 0 .4-.2 1.3-.7 1.6-.5.4-1.3.6-2.1.3a9 9 0 0 1-4.3-3.2c-.9-1.1-1.4-2.3-1.4-3 0-.4.1-.8.2-1.1z" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-mail-open" viewBox="0 0 24 24"><path d="M21.2 8.4c-.5-.4-1.2-.5-1.8-.2L12 12.8 4.6 8.2c-.6-.3-1.3-.2-1.8.2C2.3 8.8 2 9.4 2 10.1v8.4c0 1.4 1.1 2.5 2.5 2.5h15c1.4 0 2.5-1.1 2.5-2.5v-8.4c0-.7-.3-1.3-.8-1.7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 9l9-6 9 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
     </defs>
   </svg>
 
-  <!-- ================= COVER ================= -->
+  <!-- ================= COVER (LUXURY ENVELOPE SUITE) ================= -->
   <div class="cover" id="cover" role="dialog" aria-modal="true" aria-label="Undangan pernikahan">
-    <div class="cover__frame" aria-hidden="true"></div>
-    <div class="cover__photo">
-      <img src="assets/images/hero.jpg" alt="Pasangan pengantin berjalan di antara pepohonan" fetchpriority="high" />
-      <div class="cover__photo-scrim" aria-hidden="true"></div>
+    <!-- Atmospheric Romantic Backdrop -->
+    <div class="cover__backdrop" aria-hidden="true">
+      <img class="cover__bg-img" src="assets/images/hero.jpg" alt="Background Pengantin" fetchpriority="high" />
+      <div class="cover__backdrop-scrim"></div>
+      <div class="cover__backdrop-vignette"></div>
+      
+      <!-- Subtle Golden Sparks / Petals -->
+      <div class="cover__sparks">
+        <span class="cover__spark s--1"></span>
+        <span class="cover__spark s--2"></span>
+        <span class="cover__spark s--3"></span>
+        <span class="cover__spark s--4"></span>
+        <span class="cover__spark s--5"></span>
+      </div>
       <p class="cover__photo-caption">Yogyakarta, Indonesia</p>
     </div>
 
-    <div class="cover__panel">
-      <div class="cover__top">
-        <span class="monogram" aria-hidden="true"></span>
-        <span class="cover__tag">Undangan Pernikahan</span>
-      </div>
+    <!-- Centered Realistic Luxury Envelope Stage -->
+    <div class="cover__stage">
+      <div class="envelope" id="envelope">
+        
+        <!-- Base Paper Lining -->
+        <div class="envelope__base" aria-hidden="true"></div>
 
-      <div class="cover__main">
-        <p class="overline">The Wedding Of</p>
-        <h1 class="cover__names"></h1>
-        <p class="cover__date"></p>
-
-        <div class="cover__guest">
-          <span class="cover__guest-label">Kepada</span>
-          <span class="cover__guest-name" id="guestName">Bapak / Ibu / Saudara/i</span>
+        <!-- Inner Gilded Invitation Card (Peek effect) -->
+        <div class="envelope__inner-card" aria-hidden="true">
+          <div class="envelope__card-border"></div>
         </div>
 
-        <button class="seal" id="openInvite" type="button" aria-label="Buka undangan">
-          <span class="seal__ring" aria-hidden="true"></span>
-          <span class="seal__core">
-            <span class="seal__mono"></span>
-            <span class="seal__hint">Buka</span>
-          </span>
-        </button>
-      </div>
+        <!-- Top 3D Envelope Flap (Graceful Euro-V Curve) -->
+        <div class="envelope__flap" aria-hidden="true">
+          <svg class="envelope__flap-svg" viewBox="0 0 420 220" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="envelopeFlapGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#fffdfa"/>
+                <stop offset="65%" stop-color="#f5ede2"/>
+                <stop offset="100%" stop-color="#e6d4c0"/>
+              </linearGradient>
+              <filter id="flapShadow" x="-10%" y="0%" width="120%" height="160%">
+                <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="rgba(35, 20, 10, 0.32)"/>
+              </filter>
+            </defs>
+            <!-- Flap shape: Graceful Euro-V pointing to center seal -->
+            <path d="M 0,0 L 0,16 C 60,32 150,115 200,205 C 206,215 214,215 220,205 C 270,115 360,32 420,16 L 420,0 Z" 
+                  fill="url(#envelopeFlapGrad)" filter="url(#flapShadow)"/>
+            <!-- Stitched Gold Line -->
+            <path d="M 8,16 C 65,30 152,112 203,200 C 206,206 214,206 217,200 C 268,112 355,30 412,16" 
+                  fill="none" stroke="rgba(217, 154, 106, 0.55)" stroke-width="1.3" stroke-dasharray="5 3.5"/>
+          </svg>
+        </div>
 
-      <div class="cover__bottom">
-        <span class="cover__scroll"><span></span> Gulir untuk membuka</span>
-        <span class="cover__hashtag"></span>
+        <!-- Bottom Envelope Pocket & Side Folds -->
+        <div class="envelope__pocket" aria-hidden="true">
+          <svg class="envelope__pocket-svg" viewBox="0 0 420 280" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="pocketBaseGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stop-color="#e2cfbc"/>
+                <stop offset="60%" stop-color="#f3eae0"/>
+                <stop offset="100%" stop-color="#fcf9f4"/>
+              </linearGradient>
+              <linearGradient id="wingLeftGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ebd8c4"/>
+                <stop offset="100%" stop-color="#faf5ee"/>
+              </linearGradient>
+              <linearGradient id="wingRightGrad" x1="100%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ebd8c4"/>
+                <stop offset="100%" stop-color="#faf5ee"/>
+              </linearGradient>
+              <filter id="pocketShadow" x="-10%" y="-15%" width="120%" height="135%">
+                <feDropShadow dx="0" dy="-4" stdDeviation="6" flood-color="rgba(35, 20, 10, 0.22)"/>
+              </filter>
+            </defs>
+            <!-- Left Wing Fold -->
+            <path d="M 0,280 L 0,30 L 175,280 Z" fill="url(#wingLeftGrad)" opacity="0.6"/>
+            <!-- Right Wing Fold -->
+            <path d="M 420,280 L 420,30 L 245,280 Z" fill="url(#wingRightGrad)" opacity="0.6"/>
+            <!-- Bottom Pocket Triangular V-Fold folding up -->
+            <path d="M 0,280 L 210,65 L 420,280 Z" fill="url(#pocketBaseGrad)" filter="url(#pocketDropShadow)"/>
+            <!-- Gold Trim on Bottom Flap -->
+            <path d="M 8,276 L 210,72 L 412,276" fill="none" stroke="rgba(217, 154, 106, 0.45)" stroke-width="1.2" stroke-dasharray="5 3.5"/>
+          </svg>
+        </div>
+
+        <!-- Envelope Content (Typography, Seal & Guest Plaque) -->
+        <div class="envelope__content">
+          
+          <!-- Top Area: The Wedding Of & Names -->
+          <div class="envelope__header">
+            <div class="envelope__header-top">
+              <span class="monogram monogram--sm" aria-hidden="true"></span>
+            </div>
+            <p class="overline">The Wedding Of</p>
+            <h1 class="cover__names"></h1>
+            <p class="cover__date"></p>
+          </div>
+
+          <!-- Center Area: The 3D Wax Seal Stamp (The Sole Interactive Trigger) -->
+          <div class="envelope__seal-area">
+            <button class="seal seal--center" id="openInvite" type="button" aria-label="Buka undangan pernikahan" title="Sentuh untuk membuka undangan">
+              <span class="seal__ring" aria-hidden="true"></span>
+              <span class="seal__core">
+                <span class="seal__mono"></span>
+                <span class="seal__hint">BUKA</span>
+              </span>
+              <span class="seal__pulse" aria-hidden="true"></span>
+            </button>
+            <!-- <span class="seal__caption">Sentuh segel untuk membuka</span> -->
+          </div>
+
+          <!-- Bottom Area: Recipient Plaque on Envelope Pocket -->
+          <div class="envelope__recipient">
+            <div class="cover__guest">
+              <span class="cover__guest-label">Kepada Yth. Bapak/Ibu/Saudara/i:</span>
+              <div class="cover__guest-frame">
+                <span class="cover__guest-name" id="guestName">Bapak / Ibu / Saudara/i</span>
+              </div>
+              <span class="cover__guest-note">di Tempat</span>
+            </div>
+            <span class="cover__hashtag"></span>
+          </div>
+
+        </div>
       </div>
     </div>
   </div>
@@ -365,10 +453,6 @@
       <footer class="footer">
         <div class="container footer__inner">
           <p class="footer__credit">Dibuat dengan <svg class="icon icon--heart" aria-hidden="true"><use href="#i-heart"/></svg> untuk hari yang istimewa.</p>
-          <a class="footer__guest-link" href="tamu.html" target="_blank" title="Buka Generator Link Undangan Tamu">
-            <svg class="icon" aria-hidden="true"><use href="#i-share"/></svg>
-            Kelola Tamu &amp; WhatsApp
-          </a>
         </div>
       </footer>
     </main>
