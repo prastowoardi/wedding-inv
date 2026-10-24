@@ -515,6 +515,19 @@
       font-weight: 500;
     }
 
+    .gen-style-badge {
+      display: inline-block;
+      font-size: 0.62rem;
+      letter-spacing: 0.06em;
+      padding: 0.12rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.05);
+      color: var(--muted);
+      border: 1px solid var(--line);
+      margin-left: 0.3rem;
+      vertical-align: middle;
+    }
+
     /* Tabs */
     .tab-nav {
       display: flex;
@@ -593,12 +606,12 @@
         <div class="gen-field">
           <label for="templateSelect">Gaya Pesan WhatsApp</label>
           <select id="templateSelect">
-            <option value="formal" selected>1. Formal &amp; Santun (Keluarga, Tokoh, Kolega)</option>
-            <option value="warm">2. Hangat &amp; Akrab (Sahabat, Teman Sebaya)</option>
-            <option value="simple">3. Singkat &amp; Padat</option>
-            <option value="auto">🌟 Otomatis dari Kategori Excel (Teman = Akrab, Keluarga/VIP = Formal)</option>
+            <option value="auto" selected>🌟 Otomatis dari Kategori (Teman = Akrab, Keluarga/VIP = Formal)</option>
+            <option value="formal">1. Selalu Formal &amp; Santun (Semua Tamu)</option>
+            <option value="warm">2. Selalu Hangat &amp; Akrab (Semua Tamu)</option>
+            <option value="simple">3. Selalu Singkat &amp; Padat (Semua Tamu)</option>
           </select>
-          <span class="gen-hint">Bisa diubah kapan saja. Berlaku untuk pengiriman satuan maupun hasil import Excel.</span>
+          <span class="gen-hint">Otomatis menyesuaikan pesan dengan kategori tamu (Teman / Keluarga).</span>
         </div>
       </div>
     </div>
@@ -629,6 +642,15 @@
             <label for="guestPhoneInput">No. WhatsApp Tamu (Opsional)</label>
             <input id="guestPhoneInput" type="tel" placeholder="Contoh: 081234567890" />
             <span class="gen-hint">Jika diisi, Anda bisa langsung kirim WA tanpa perlu simpan nomor kontak.</span>
+          </div>
+          <div class="gen-field">
+            <label for="guestCategoryInput">Kategori Tamu</label>
+            <select id="guestCategoryInput">
+              <option value="Keluarga">Keluarga (Pesan Formal &amp; Santun)</option>
+              <option value="Teman">Teman / Sahabat (Pesan Hangat &amp; Akrab)</option>
+              <option value="Rekan Kerja">Rekan Kerja / Kolega (Pesan Formal)</option>
+              <option value="VIP">VIP / Tokoh (Pesan Formal)</option>
+            </select>
           </div>
         </div>
 
@@ -712,13 +734,13 @@
         </div>
         <div class="gen-field">
           <label for="bulkNames">Ketik / Tempel Daftar Nama Tamu (Satu Nama per Baris):</label>
-          <textarea id="bulkNames" rows="7" placeholder="Contoh format:
-Bpk. Ahmad Dahlan &amp; Keluarga, 081234567890
-dr. Rian Prakoso, 081298765432
-Kak Dinda &amp; Partner
-Ibu Sri Wahyuni, 081344556677
-Dimas Prasetyo"></textarea>
-          <span class="gen-hint">Bisa hanya nama, atau nama dan nomor WA yang dipisahkan koma (,).</span>
+          <textarea id="bulkNames" rows="7" placeholder="Contoh format (Nama, No WA, Kategori):
+Bpk. Ahmad Dahlan &amp; Keluarga, 081234567890, Keluarga
+dr. Rian Prakoso, 081298765432, Rekan Kerja
+Kak Dinda &amp; Partner, 081311223344, Teman
+Ibu Sri Wahyuni, 081344556677, Keluarga
+Dimas Prasetyo, 082199887766, Teman"></textarea>
+          <span class="gen-hint">Bisa hanya nama, atau format koma: <code>Nama, No WA, Kategori</code>. Kategori <strong>Teman</strong> otomatis menggunakan pesan akrab.</span>
         </div>
         <div class="gen-actions" style="margin-top: 1rem;">
           <button class="btn btn--solid" id="bulkAddBtn" type="button">
@@ -838,6 +860,7 @@ Dimas Prasetyo"></textarea>
       const baseUrlInput = document.getElementById("baseUrlInput");
       const nameInput = document.getElementById("guestNameInput");
       const phoneInput = document.getElementById("guestPhoneInput");
+      const guestCategoryInput = document.getElementById("guestCategoryInput");
       const templateSelect = document.getElementById("templateSelect");
       const previewText = document.getElementById("previewText");
       const previewLink = document.getElementById("previewLink");
@@ -880,21 +903,20 @@ Dimas Prasetyo"></textarea>
         return base + separator + "to=" + encodeURIComponent(name);
       }
 
-      function generateMessage(name, url, category = "") {
-        let style = templateSelect.value;
-
-        // Jika mode auto, deteksi dari kategori
-        if (style === "auto") {
-          const cat = String(category || "").toLowerCase();
-          if (cat.includes("teman") || cat.includes("sahabat") || cat.includes("kuliah") || cat.includes("sma") || cat.includes("partner") || cat.includes("akrab")) {
-            style = "warm";
-          } else if (cat.includes("singkat") || cat.includes("simple")) {
-            style = "simple";
-          } else {
-            style = "formal";
-          }
+      function getResolvedTemplateStyle(category = "", forcedStyle = null) {
+        const style = forcedStyle || templateSelect.value;
+        if (style !== "auto") return style;
+        const cat = String(category || "").toLowerCase();
+        if (cat.includes("teman") || cat.includes("sahabat") || cat.includes("kuliah") || cat.includes("sma") || cat.includes("partner") || cat.includes("akrab")) {
+          return "warm";
+        } else if (cat.includes("singkat") || cat.includes("simple")) {
+          return "simple";
         }
+        return "formal";
+      }
 
+      function generateMessage(name, url, category = "") {
+        const style = getResolvedTemplateStyle(category);
         const guestName = name.trim() || "[Nama Tamu]";
 
         if (style === "warm") {
@@ -912,12 +934,14 @@ Dimas Prasetyo"></textarea>
       function updatePreview() {
         const name = nameInput.value.trim() || "Bapak / Ibu / Saudara/i";
         const url = generateUrl(name);
-        const msg = generateMessage(name, url);
+        const cat = guestCategoryInput ? guestCategoryInput.value : "";
+        const msg = generateMessage(name, url, cat);
         previewText.textContent = msg;
         previewLink.textContent = url;
       }
 
       nameInput.addEventListener("input", updatePreview);
+      guestCategoryInput?.addEventListener("change", updatePreview);
       templateSelect.addEventListener("change", () => {
         updatePreview();
         renderGuestTable();
@@ -1016,7 +1040,8 @@ Dimas Prasetyo"></textarea>
           nameInput.focus();
           return;
         }
-        addGuest(name, phoneInput.value.trim());
+        const cat = guestCategoryInput ? guestCategoryInput.value : "";
+        addGuest(name, phoneInput.value.trim(), false, cat);
         renderGuestTable();
         showToast(`Tamu "${name}" disimpan ke daftar!`);
       });
@@ -1206,7 +1231,9 @@ Dimas Prasetyo"></textarea>
         const guest = pendingGuests[nextGuestIndex];
 
         nextGuestName.textContent = guest.name;
-        nextGuestPhone.textContent = guest.phone ? `(${guest.phone})` : "(Nomor belum diisi)";
+        const style = getResolvedTemplateStyle(guest.category);
+        const styleBadge = style === "warm" ? "💬 Akrab" : (style === "simple" ? "💬 Singkat" : "💬 Formal");
+        nextGuestPhone.innerHTML = `${guest.phone ? `(${guest.phone})` : "(Nomor belum diisi)"} · <span class="gen-cat-badge">${guest.category || 'Umum'}</span> <span class="gen-style-badge">${styleBadge}</span>`;
       }
 
       sendNextWaBtn.addEventListener("click", () => {
@@ -1292,6 +1319,8 @@ Dimas Prasetyo"></textarea>
           const waUrl = phone
             ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
             : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+          const style = getResolvedTemplateStyle(g.category);
+          const styleBadge = style === "warm" ? "💬 Akrab" : (style === "simple" ? "💬 Singkat" : "💬 Formal");
 
           return `
             <tr class="${g.sent ? 'is-done' : ''}" data-id="${g.id}">
@@ -1299,14 +1328,14 @@ Dimas Prasetyo"></textarea>
                 <input class="gen-check" type="checkbox" ${g.sent ? 'checked' : ''} aria-label="Centang jika sudah dikirim" />
               </td>
               <td>
-                <strong>${g.name}</strong>${g.category ? ` <span class="gen-cat-badge">${g.category}</span>` : ''}
+                <strong>${g.name}</strong>${g.category ? ` <span class="gen-cat-badge">${g.category}</span>` : ''} <span class="gen-style-badge" title="Format pesan yang dipakai">${styleBadge}</span>
               </td>
               <td style="color: var(--muted); font-family: monospace;">
                 ${g.phone || '-'}
               </td>
               <td>
                 <div class="gen-row-actions" style="justify-content: flex-end;">
-                  <a class="gen-btn-sm gen-btn-sm--wa" href="${waUrl}" target="_blank" title="Kirim via WhatsApp" aria-label="Kirim WhatsApp">
+                  <a class="gen-btn-sm gen-btn-sm--wa" href="${waUrl}" target="_blank" title="Kirim via WhatsApp (${styleBadge})" aria-label="Kirim WhatsApp">
                     <svg class="icon"><use href="#i-whatsapp"/></svg>
                   </a>
                   <button class="gen-btn-sm" data-action="copy-msg" data-name="${g.name}" title="Salin Pesan WA" type="button" aria-label="Salin Pesan">
