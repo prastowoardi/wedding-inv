@@ -223,7 +223,22 @@
             <h2 class="display reveal">Sekeping<br /><em>kenangan.</em></h2>
             <p class="lede reveal" data-delay="1">Beberapa potret yang kami simpan rapat, sebagai pengingat bahwa cinta tumbuh dalam hal-hal kecil.</p>
           </div>
-          <div class="gallery" id="galleryGrid"></div>
+
+          <div class="gallery-carousel reveal" data-delay="2">
+            <div class="gallery-slider" id="gallerySlider" tabindex="0" role="region" aria-label="Galeri foto">
+              <div class="gallery-track gallery" id="galleryTrack"></div>
+            </div>
+
+            <div class="gallery-controls">
+              <button class="gallery-nav gallery-nav--prev" id="galleryPrev" type="button" aria-label="Foto sebelumnya">
+                <svg class="icon" aria-hidden="true"><use href="#i-chevron-left"/></svg>
+              </button>
+              <div class="gallery-dots" id="galleryDots" role="tablist" aria-label="Pilih foto galeri"></div>
+              <button class="gallery-nav gallery-nav--next" id="galleryNext" type="button" aria-label="Foto berikutnya">
+                <svg class="icon" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 

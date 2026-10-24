@@ -367,25 +367,318 @@
     }
   }
 
+  let galleryAutoPlayTimer = null;
+  let currentGalleryIndex = 0;
+  let galleryCleanup = null;
+
   function renderGallery() {
-    const grid = $("#galleryGrid");
-    if (grid && Array.isArray(C.gallery)) {
-      grid.innerHTML = C.gallery
+    if (typeof galleryCleanup === "function") {
+      galleryCleanup();
+      galleryCleanup = null;
+    }
+
+    const track = $("#galleryTrack") || $("#galleryGrid");
+    const slider = $("#gallerySlider");
+    const dotsContainer = $("#galleryDots");
+    const prevBtn = $("#galleryPrev");
+    const nextBtn = $("#galleryNext");
+
+    if (!track || !Array.isArray(C.gallery) || !C.gallery.length) return;
+
+    // Render slides
+    track.innerHTML = C.gallery
+      .map(
+        (item, i) => `
+          <button class="gallery__item${i === 0 ? " is-active" : ""}" type="button" data-index="${i}" aria-label="Perbesar foto: ${item.caption}">
+            <img src="${item.src}" alt="${item.alt}" loading="lazy" decoding="async" />
+            <span class="gallery__cap">
+              <span>${item.caption}</span>
+              <span class="gallery__num">0${i + 1}</span>
+            </span>
+          </button>`,
+      )
+      .join("");
+
+    // Render dots
+    if (dotsContainer) {
+      dotsContainer.innerHTML = C.gallery
         .map(
           (item, i) => `
-            <button class="gallery__item reveal" type="button" data-index="${i}" aria-label="Perbesar foto: ${item.caption}">
-              <img src="${item.src}" alt="${item.alt}" loading="lazy" decoding="async" />
-              <span class="gallery__cap">${item.caption}</span>
-            </button>`,
+            <button class="gallery-dot${i === 0 ? " is-active" : ""}" type="button" role="tab" data-index="${i}" aria-label="Lihat foto ke-${i + 1} (${item.caption})" aria-selected="${i === 0 ? "true" : "false"}"></button>`,
         )
         .join("");
+    }
 
-      $$(".gallery__item").forEach((btn) => {
+    if (!slider) {
+      $$(".gallery__item", track).forEach((btn) => {
         btn.addEventListener("click", () =>
           openLightbox(Number(btn.dataset.index)),
         );
       });
+      return;
     }
+
+    currentGalleryIndex = 0;
+    let isPointerDown = false;
+    let startX = 0;
+    let scrollStart = 0;
+    let hasDragged = false;
+    let touchStartX = 0;
+    let isTouching = false;
+    let isGalleryVisible = true;
+    let scrollRaf = null;
+
+    function setActiveSlideState(index) {
+      currentGalleryIndex = index;
+      const items = $$(".gallery__item", track);
+      const dots = $$(".gallery-dot", dotsContainer);
+
+      items.forEach((it, i) => {
+        it.classList.toggle("is-active", i === index);
+      });
+
+      dots.forEach((dot, i) => {
+        const isActive = i === index;
+        dot.classList.toggle("is-active", isActive);
+        dot.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+    }
+
+    function goToSlide(index, smooth = true) {
+      const items = $$(".gallery__item", track);
+      if (!items.length) return;
+      const total = items.length;
+      const targetIndex = ((index % total) + total) % total;
+      const item = items[targetIndex];
+      if (!item) return;
+
+      const targetLeft =
+        item.offsetLeft - (slider.clientWidth - item.clientWidth) / 2;
+      const maxScroll = slider.scrollWidth - slider.clientWidth;
+      const clampedScroll = Math.max(0, Math.min(targetLeft, maxScroll));
+
+      slider.scrollTo({
+        left: clampedScroll,
+        behavior: smooth ? "smooth" : "auto",
+      });
+
+      setActiveSlideState(targetIndex);
+    }
+
+    function getClosestIndex() {
+      const items = $$(".gallery__item", track);
+      if (!items.length) return 0;
+      const sliderCenter = slider.scrollLeft + slider.clientWidth / 2;
+      let closestIndex = 0;
+      let minDiff = Infinity;
+      items.forEach((item, idx) => {
+        const itemCenter = item.offsetLeft + item.clientWidth / 2;
+        const diff = Math.abs(sliderCenter - itemCenter);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestIndex = idx;
+        }
+      });
+      return closestIndex;
+    }
+
+    function pauseAutoPlay() {
+      if (galleryAutoPlayTimer) {
+        clearInterval(galleryAutoPlayTimer);
+        galleryAutoPlayTimer = null;
+      }
+    }
+
+    function startAutoPlay() {
+      pauseAutoPlay();
+      if (reduceMotion) return;
+      if (!isGalleryVisible) return;
+      if (C.gallery.length <= 1) return;
+
+      galleryAutoPlayTimer = setInterval(() => {
+        goToSlide(currentGalleryIndex + 1, true);
+      }, 3500);
+    }
+
+    // Scroll listener for manual swipe & sync
+    const onScroll = () => {
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      scrollRaf = requestAnimationFrame(() => {
+        const closest = getClosestIndex();
+        if (closest !== currentGalleryIndex) {
+          setActiveSlideState(closest);
+        }
+      });
+    };
+    slider.addEventListener("scroll", onScroll, { passive: true });
+
+    // Prev / Next navigation
+    const onPrev = () => {
+      pauseAutoPlay();
+      goToSlide(currentGalleryIndex - 1, true);
+      startAutoPlay();
+    };
+    const onNext = () => {
+      pauseAutoPlay();
+      goToSlide(currentGalleryIndex + 1, true);
+      startAutoPlay();
+    };
+    prevBtn?.addEventListener("click", onPrev);
+    nextBtn?.addEventListener("click", onNext);
+
+    // Dots navigation
+    const onDotsClick = (e) => {
+      const dot = e.target.closest(".gallery-dot");
+      if (!dot) return;
+      pauseAutoPlay();
+      goToSlide(Number(dot.dataset.index), true);
+      startAutoPlay();
+    };
+    dotsContainer?.addEventListener("click", onDotsClick);
+
+    // Mouse drag-to-scroll
+    const onMouseDown = (e) => {
+      if (e.button !== 0) return;
+      isPointerDown = true;
+      hasDragged = false;
+      startX = e.pageX;
+      scrollStart = slider.scrollLeft;
+      slider.classList.add("is-dragging");
+      pauseAutoPlay();
+    };
+    const onMouseMove = (e) => {
+      if (!isPointerDown) return;
+      const dx = e.pageX - startX;
+      if (Math.abs(dx) > 6) {
+        hasDragged = true;
+      }
+      slider.scrollLeft = scrollStart - dx;
+    };
+    const onMouseUp = () => {
+      if (!isPointerDown) return;
+      isPointerDown = false;
+      slider.classList.remove("is-dragging");
+      if (hasDragged) {
+        goToSlide(getClosestIndex(), true);
+      }
+      startAutoPlay();
+    };
+
+    slider.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+
+    // Touch events
+    const onTouchStart = (e) => {
+      isTouching = true;
+      hasDragged = false;
+      if (e.touches && e.touches[0]) {
+        touchStartX = e.touches[0].pageX;
+      }
+      pauseAutoPlay();
+    };
+    const onTouchMove = (e) => {
+      if (e.touches && e.touches[0]) {
+        const dx = Math.abs(e.touches[0].pageX - touchStartX);
+        if (dx > 8) hasDragged = true;
+      }
+    };
+    let touchEndTimeout = null;
+    const onTouchEnd = () => {
+      isTouching = false;
+      if (touchEndTimeout) clearTimeout(touchEndTimeout);
+      touchEndTimeout = setTimeout(startAutoPlay, 2500);
+    };
+
+    slider.addEventListener("touchstart", onTouchStart, { passive: true });
+    slider.addEventListener("touchmove", onTouchMove, { passive: true });
+    slider.addEventListener("touchend", onTouchEnd, { passive: true });
+
+    // Item click -> Lightbox (only if not dragged)
+    $$(".gallery__item", track).forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        if (hasDragged) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+        openLightbox(Number(btn.dataset.index));
+      });
+    });
+
+    // Keyboard support
+    const onKeyDown = (e) => {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        onPrev();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        onNext();
+      }
+    };
+    slider.addEventListener("keydown", onKeyDown);
+
+    // Hover pause
+    const onMouseEnter = () => pauseAutoPlay();
+    const onMouseLeave = () => {
+      if (!isPointerDown && !isTouching) startAutoPlay();
+    };
+    slider.addEventListener("mouseenter", onMouseEnter);
+    slider.addEventListener("mouseleave", onMouseLeave);
+
+    // Visibility change
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        pauseAutoPlay();
+      } else {
+        startAutoPlay();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    // Intersection Observer (play only when in view)
+    let observer = null;
+    const gallerySection = $("#gallery");
+    if ("IntersectionObserver" in window && gallerySection) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            isGalleryVisible = entry.isIntersecting;
+            if (isGalleryVisible) {
+              startAutoPlay();
+            } else {
+              pauseAutoPlay();
+            }
+          });
+        },
+        { threshold: 0.15 },
+      );
+      observer.observe(gallerySection);
+    } else {
+      startAutoPlay();
+    }
+
+    // Cleanup reference
+    galleryCleanup = () => {
+      pauseAutoPlay();
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      if (touchEndTimeout) clearTimeout(touchEndTimeout);
+      if (observer) observer.disconnect();
+      slider.removeEventListener("scroll", onScroll);
+      prevBtn?.removeEventListener("click", onPrev);
+      nextBtn?.removeEventListener("click", onNext);
+      dotsContainer?.removeEventListener("click", onDotsClick);
+      slider.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+      slider.removeEventListener("touchstart", onTouchStart);
+      slider.removeEventListener("touchmove", onTouchMove);
+      slider.removeEventListener("touchend", onTouchEnd);
+      slider.removeEventListener("keydown", onKeyDown);
+      slider.removeEventListener("mouseenter", onMouseEnter);
+      slider.removeEventListener("mouseleave", onMouseLeave);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }
 
   function renderGifts() {
