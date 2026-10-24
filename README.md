@@ -1,4 +1,4 @@
-# Undangan Pernikahan — Arinta & Fajar
+# Undangan Pernikahan
 
 Sebuah undangan pernikahan elektronik yang modern, editorial, dan ramah untuk dibagikan lewat tautan. Dibangun murni dengan HTML, CSS, dan JavaScript — tanpa build step, bisa langsung dideploy di hosting gratisan maupun berbayar.
 

@@ -288,8 +288,11 @@
 
             <div class="wishes reveal" data-delay="1">
               <div class="wishes__head">
-                <h3>Ucapan terbaru</h3>
-                <span id="wishesCount">0 pesan</span>
+                <div class="wishes__title-wrap">
+                  <h3>Ucapan terbaru</h3>
+                  <span class="live-badge" title="Pembaruan otomatis realtime"><span class="live-dot"></span>Realtime</span>
+                </div>
+                <span id="wishesCount">0 ucapan</span>
               </div>
               <ul class="wishes__list" id="wishesList"></ul>
               <p class="wishes__empty" id="wishesEmpty" hidden>Belum ada ucapan. Jadilah yang pertama menuliskan doa.</p>
@@ -329,14 +332,6 @@
 
       <footer class="footer">
         <div class="container footer__inner">
-          <div class="footer__brand">
-            <span class="monogram monogram--sm" aria-hidden="true"></span>
-            <p id="footerBrandText"></p>
-          </div>
-          <div class="footer__links">
-            <a href="#opening">Kembali ke atas</a>
-            <button type="button" id="footerShare">Bagikan</button>
-          </div>
           <p class="footer__credit">Dibuat dengan <svg class="icon icon--heart" aria-hidden="true"><use href="#i-heart"/></svg> untuk hari yang istimewa.</p>
         </div>
       </footer>

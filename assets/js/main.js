@@ -428,6 +428,15 @@
     $$("[data-copy]").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const ok = await copyText(btn.dataset.copy);
+        if (ok) {
+          const originalHTML = btn.innerHTML;
+          btn.innerHTML = `<svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Tersalin!`;
+          btn.classList.add('is-copied');
+          setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.classList.remove('is-copied');
+          }, 2000);
+        }
         toast(
           ok
             ? `${btn.dataset.copyLabel || "Teks"} disalin.`
@@ -554,6 +563,8 @@
      RSVP & ucapan
      ===================================================== */
   let remoteWishes = [];
+  let isFetchingRemote = false;
+  let pollingInterval = null;
 
   function loadWishes() {
     let stored = [];
@@ -590,13 +601,15 @@
     return unique.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }
 
-  async function fetchRemoteWishes() {
-    if (!C.rsvp?.endpoint) return;
+  async function fetchRemoteWishes({ silent = false } = {}) {
+    if (!C.rsvp?.endpoint || isFetchingRemote) return;
+    isFetchingRemote = true;
     try {
       const res = await fetch(C.rsvp.endpoint, { method: "GET" });
       if (!res.ok) return;
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
+      if (Array.isArray(data)) {
+        const prevCount = remoteWishes.length;
         remoteWishes = data.map((item) => ({
           name: item.name || "Tamu",
           attendance: item.attendance || "Hadir",
@@ -607,12 +620,48 @@
               ? item.createdAt
               : new Date(item.createdAt).getTime() || Date.now(),
         }));
-        renderWishes();
+        if (remoteWishes.length !== prevCount || !silent) {
+          renderWishes({ preserveScroll: silent });
+        }
       }
     } catch (err) {
-      // Graceful fallback to local cache
-      console.info("Mode ucapan offline / lokal aktif.");
+      if (!silent) console.info("Mode ucapan offline / lokal aktif.");
+    } finally {
+      isFetchingRemote = false;
     }
+  }
+
+  function startWishesRealtime() {
+    // 1. Sinkronisasi multi-tab secara instan
+    window.addEventListener("storage", (e) => {
+      if (e.key === STORAGE_RSVP) {
+        renderWishes({ preserveScroll: true });
+      }
+    });
+
+    // 2. Realtime polling berkala dari online database (setiap 10 detik saat tab aktif)
+    if (!C.rsvp?.endpoint) return;
+
+    function poll() {
+      if (document.visibilityState === "visible") {
+        fetchRemoteWishes({ silent: true });
+      }
+    }
+
+    if (pollingInterval) clearInterval(pollingInterval);
+    pollingInterval = setInterval(poll, 10000);
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        fetchRemoteWishes({ silent: true });
+        if (!pollingInterval) pollingInterval = setInterval(poll, 10000);
+      } else {
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+          pollingInterval = null;
+        }
+      }
+    });
   }
 
   function saveWish(wish) {
@@ -646,16 +695,17 @@
     });
   }
 
-  function renderWishes() {
+  function renderWishes({ preserveScroll = false } = {}) {
     const list = $("#wishesList");
     if (!list) return;
+    const previousScrollTop = list.scrollTop;
     const empty = $("#wishesEmpty");
     const wishes = loadWishes();
     list.innerHTML = "";
 
     wishes.forEach((wish) => {
       const li = document.createElement("li");
-      const isRecent = Date.now() - (wish.createdAt || 0) < 15000;
+      const isRecent = Date.now() - (wish.createdAt || 0) < 20000;
       li.className = isRecent ? "wish wish--recent" : "wish";
 
       const top = document.createElement("div");
@@ -690,11 +740,16 @@
     const countEl = $("#wishesCount");
     if (countEl) countEl.textContent = `${wishes.length} ucapan`;
     if (empty) empty.hidden = wishes.length > 0;
+
+    if (preserveScroll && previousScrollTop > 30) {
+      list.scrollTop = previousScrollTop;
+    }
   }
 
   function initRsvp() {
     renderWishes();
     fetchRemoteWishes();
+    startWishesRealtime();
 
     const form = $("#rsvpForm");
     if (!form) return;
@@ -1138,6 +1193,19 @@
     initAnchors();
 
     $("#openInvite")?.addEventListener("click", openInvitation);
+    if (cover) {
+      cover.addEventListener("wheel", (e) => {
+        if (e.deltaY > 20) openInvitation();
+      }, { passive: true });
+      let touchY = 0;
+      cover.addEventListener("touchstart", (e) => {
+        touchY = e.touches[0]?.clientY || 0;
+      }, { passive: true });
+      cover.addEventListener("touchend", (e) => {
+        const endY = e.changedTouches[0]?.clientY || 0;
+        if (touchY - endY > 40) openInvitation();
+      }, { passive: true });
+    }
     $("#addCalendar")?.addEventListener("click", addToCalendar);
     $("#shareInvite")?.addEventListener("click", shareInvitation);
     $("#footerShare")?.addEventListener("click", shareInvitation);

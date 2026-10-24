@@ -139,6 +139,6 @@ window.WEDDING = {
 
   music: {
     enabled: true,
-    volume: 0.12,
+    volume: 0.35,
   },
 };
